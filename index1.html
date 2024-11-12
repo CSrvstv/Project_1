@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Communication Assistant</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: rgb(34,171,195);
+            background: radial-gradient(circle, rgba(34,171,195,1) 0%, rgba(151,45,253,1) 100%);
+        }
+            .main{
+            border: solid black 2px;
+            padding: 20px;
+            border-radius: 5px;
+            background-color: whitesmoke;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        a,button{
+            text-decoration: none;
+            color: white;
+            background-color: rgba(151,45,253,1);
+            border-radius: 5px;
+            font-size: medium;
+            margin: 20px;
+            align-items: center;
+            justify-content: center;
+            padding: 10px;
+        }
+        .options{
+            display: flex;
+            justify-content: space-evenly;
+        }
+        .start{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body onload="guide()">
+    <div class="main">
+        <h1>Communication Assistant</h1><hr>    
+    <p>Select conditions for Person 1 and Person 2 to determine communication style.</p>
+
+    <form id="communicationForm" >
+        <div class="options">
+            <div>
+                <label for="person1">Person 1:</label>
+                <select id="person1" name="person1" required>
+                    <option value="1">Blind</option>
+                    <option value="2">Mute</option>
+                    <option value="3">Deaf</option>
+                </select>
+            </div>
+            <div>
+                <label for="person2">Person 2:</label>
+            <select id="person2" name="person2" required>
+                <option value="1">Blind</option>
+                <option value="2">Mute</option>
+                <option value="3">Deaf</option>
+            </select>
+            </div>
+        
+        </div>
+        
+        <br>
+        <div class="start">
+            <button type="submit" ><a id="actionButton" href="/public/chat.html">Start Communication</a></button>
+        </div>
+    </form>
+    </div>
+    
+
+    <script>
+        document.addEventListener("keydown", function(event) {
+            if (event.key === "Enter") {
+                document.getElementById("actionButton").click();
+            }
+        });
+        function guide()
+        {
+            const speechSynthesis = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance("Press Enter to Start the communication.");
+            speechSynthesis.speak(utterance);
+        }
+        document.getElementById("communicationForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const p1 = parseInt(document.getElementById("person1").value);
+            const p2 = parseInt(document.getElementById("person2").value);
+
+            fetch("http://127.0.0.1:5000/api/communicate", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ p1: p1, p2: p2 })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("responseText").innerText = data.response;
+            })
+            .catch(error => {
+                console.error("Error:", error);
+            });
+        });
+    </script>
+</body>
+</html>
